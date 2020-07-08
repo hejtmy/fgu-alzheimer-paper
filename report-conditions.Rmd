@@ -1,11 +1,11 @@
 ---
-title: "Run 34 report"
 author: "Lukáš Hejtmánek"
-date: "22 December 2019"
+date: "`r date()`"
 output: html_document
 params:
   session_name: NONE
   data: NULL
+title: "`r params$session_name`"
 ---
 
 ```{r setup, include=FALSE}

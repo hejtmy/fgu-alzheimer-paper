@@ -1,0 +1,48 @@
+---
+title: "Freezing"
+author: "Lukáš 'hejtmy' Hejtmánek"
+date: "08/07/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(fgu.avoidance)
+source("functions/loading.R")
+source("functions/analysis.R")
+data_folder <- file.path("data", "")
+
+obj <- load_data(data_folder)
+```
+
+## Speed investigation
+
+```{r}
+animal <- obj$hab1$females$animal_10
+animal$position <- remove_unreal_speeds(animal$position, type = "value", cutoff = 500)
+plot_speed(animal)
+```
+We will set the freezing speed to the length of 1. As the area of the entire cage is 420 units long, this means the animal has moved in a speech which would take them 840s to cross the entire cage. For the reasons I describe [here](http://hejtmy.com/fgu-avoidance/articles/freezing.html), it is impossible to set the speed to 0, because of how the machine actually records animal positions.
+
+WE set the minimal duration to 2 seconds.
+
+
+```{r}
+freezes <- analyze_freezing(animal, min_duration = 2, speed_threshold = 1)
+str(freezes$data)
+```
+This settings leads to `r freezes$summary$n_freezes` instances of freezing behavior for a total duration of `r sum(freezes$duration)` seconds, ergo `r round(freezes$summary$time_ratio*100, 2)`. percent of the entire time.
+
+```{r}
+plot_speed(animal) +
+  geom_navr_timeseries_events(freezes$data$time_since_start, freezes$data$duration, color = "red")
+```
+
+Visualising position of the animal during the freezes can be seen in red.
+
+```{r}
+freeze_times <- rbind(freezes$data$time, freezes$data$time+freezes$data$duration)
+plot_path(animal) +
+  geom_navr_path_events(animal$position, freeze_times, color="red")
+```
