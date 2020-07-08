@@ -81,7 +81,7 @@ for(animal_name in names(obj$females$ActiveAvoidance)){
 ```{r}
 cat('<div class="row">')
 for(sex_group in names(obj)){
-  for(condition_group in names(obj[[sex]])){
+  for(condition_group in names(obj[[sex_group]])){
     cat('<div class="col-md-3">')
     h4(paste0(sex, "-", condition))
     group_results <- dplyr::filter(results, sex == sex_group,
