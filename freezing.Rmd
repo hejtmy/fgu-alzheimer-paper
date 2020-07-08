@@ -32,7 +32,7 @@ WE set the minimal duration to 2 seconds.
 freezes <- analyze_freezing(animal, min_duration = 2, speed_threshold = 1)
 str(freezes$data)
 ```
-This settings leads to `r freezes$summary$n_freezes` instances of freezing behavior for a total duration of `r sum(freezes$duration)` seconds, ergo `r round(freezes$summary$time_ratio*100, 2)`. percent of the entire time.
+This settings leads to `r freezes$summary$n_freezes` instances of freezing behavior for a total duration of `r freezes$summary$freeze_time` seconds, ergo `r round(freezes$summary$freeze_ratio*100, 2)`. percent of the entire time.
 
 ```{r}
 plot_speed(animal) +

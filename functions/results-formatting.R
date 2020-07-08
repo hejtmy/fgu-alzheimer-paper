@@ -8,6 +8,9 @@ session_results_output <- function(results){
   txt <- paste0(txt, results_line("Time in central zone", results$time_center))
   txt <- paste0(txt, results_line("Crosses to the right", results$crosses_right))
   txt <- paste0(txt, results_line("Crosses to the left", results$crosses_left))
+  txt <- paste0(txt, results_line("Number of freezes", results$n_freezes))
+  txt <- paste0(txt, results_line("Total freeze time", results$freeze_time))
+  txt <- paste0(txt, results_line("Freeze time ratio", results$freeze_ratio))
   txt <- paste0(txt, "")
   return(txt)
 }

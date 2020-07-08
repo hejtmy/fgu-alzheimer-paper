@@ -48,9 +48,11 @@ for(animal_name in names(obj$females)){
       dat <- obj[[sex]][[animal_name]]
       plt_path <- plot_path(dat)
       plt_presence <- plot_area_presence(dat, darkside = "left")
-      print(ggarrange(plt_path, plt_presence,
-                      ncol = 1, nrow = 2, heights = c(3,1)))
+      #print(ggarrange(plt_path, plt_presence, ncol = 1, nrow = 2, heights = c(3,1)))
       res <- session_results(dat)
+      freezes <- analyze_freezing(dat, min_duration = FREEZE_DURATION,
+                                  speed_threshold = FREEZE_SPEED)
+      res <- c(res, freezes$summary)
       res <- mutate(as.data.frame(res), sex = sex,
                     animal = animal_name)
       results <- rbind(results, res)
@@ -64,10 +66,10 @@ for(animal_name in names(obj$females)){
 ## Summary statistics
 ```{r}
 cat('<div class="row">')
-for(sex in names(obj)){
+for(sex_group in names(obj)){
   cat('<div class="col-md-6">')
-  h4(sex)
-  group_results <- filter(results, sex == sex) %>%
+  print(h4(sex_group))
+  group_results <- dplyr::filter(results, sex == sex_group) %>%
     select(-animal)
   average <- sapply(group_results, mean, na.rm=TRUE,
                     USE.NAMES = TRUE)

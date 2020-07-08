@@ -16,10 +16,13 @@ library(dplyr)
 library(ggpubr)
 source("functions/results-formatting.R")
 source("functions/loading.R")
+source("functions/analysis.R")
 source("functions/visualisation-probability.R")
 knitr::opts_chunk$set(echo = FALSE, message=FALSE,
                       warning = FALSE, results = 'asis')
 obj <- params$data
+FREEZE_DURATION <- 2
+FREEZE_SPEED <- 1
 ```
 
 ## `r params$name`
@@ -60,6 +63,9 @@ for(animal_name in names(obj$females$ActiveAvoidance)){
       print(ggarrange(plt_path, plt_presence, 
                       ncol = 1, nrow = 2, heights = c(3,1)))
       res <- session_results(dat)
+      freezes <- analyze_freezing(dat, min_duration = FREEZE_DURATION,
+                                  speed_threshold = FREEZE_SPEED)
+      res <- c(res, freezes$summary)
       res <- mutate(as.data.frame(res), condition = condition,
                     sex = sex, animal = animal_name)
       results <- rbind(results, res)
@@ -74,12 +80,12 @@ for(animal_name in names(obj$females$ActiveAvoidance)){
 ## Summary statistics
 ```{r}
 cat('<div class="row">')
-for(sex in names(obj)){
-  for(condition in names(obj[[sex]])){
+for(sex_group in names(obj)){
+  for(condition_group in names(obj[[sex]])){
     cat('<div class="col-md-3">')
     h4(paste0(sex, "-", condition))
-    group_results <- filter(results, sex == sex,
-                            condition == condition) %>%
+    group_results <- dplyr::filter(results, sex == sex_group,
+                            condition == condition_group) %>%
       select(-animal)
     average <- sapply(group_results, mean, na.rm=TRUE,
                       USE.NAMES = TRUE)

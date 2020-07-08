@@ -12,8 +12,8 @@ analyze_freezing <- function(obj, min_duration, speed_threshold){
                                  speed_threshold = speed_threshold)
   res$summary <- list(
     n_freezes = length(res$data$time),
-    total_time = sum(res$data$duration),
-    time_ratio = sum(res$data$duration)/tail(obj$position$data$time_since_start, 1)
+    freeze_time = sum(res$data$duration),
+    freeze_ratio = sum(res$data$duration)/tail(obj$position$data$time_since_start, 1)
   )
   return(res)
 }
