@@ -1,0 +1,93 @@
+---
+title: "Run 34 report"
+author: "Lukáš Hejtmánek"
+date: "22 December 2019"
+output: html_document
+params:
+  session_name: NONE
+  data: NULL
+---
+
+```{r setup, include=FALSE}
+library(fgu.avoidance)
+library(knitr)
+library(htmltools)
+library(dplyr)
+library(ggpubr)
+source("functions/results-formatting.R")
+source("functions/loading.R")
+source("functions/visualisation-probability.R")
+knitr::opts_chunk$set(echo = FALSE, message=FALSE,
+                      warning = FALSE, results = 'asis')
+obj <- params$data
+```
+
+## `r params$name`
+
+## Summative heatmaps
+```{r}
+cat('<div class="row">')
+  for(sex in names(obj)){
+    cat('<div class="col-md-6">')
+      print(h3(sex))
+      cat('<div class="row">')
+        for(condition in names(obj[[sex]])){
+          cat('<div class="col-md-6">')
+            print(h3(condition))
+            print(create_heatmap(obj[[sex]][[condition]],
+                                 bins = 100, alpha = 0.2))
+          cat('</div>')
+        }
+      cat('</div>')
+    cat('</div>')
+  }
+cat('</div>')
+```
+
+### Individual animals
+```{r}
+results <- data.frame(stringsAsFactors = FALSE)
+for(animal_name in names(obj$females$ActiveAvoidance)){
+  cat('<div class="row">')
+  for(sex in names(obj)){
+    for(condition in names(obj[[sex]])){
+      cat('<div class="col-md-3">')
+      dat <- obj[[sex]][[condition]][[animal_name]]
+      plt_path <- plot_path(dat)
+      scale <- ifelse(condition == "ActiveAvoidance", 1.5, 25)
+      plt_presence <- plot_area_presence(dat, darkside = "left",
+                                         scale = scale)
+      print(ggarrange(plt_path, plt_presence, 
+                      ncol = 1, nrow = 2, heights = c(3,1)))
+      res <- session_results(dat)
+      res <- mutate(as.data.frame(res), condition = condition,
+                    sex = sex, animal = animal_name)
+      results <- rbind(results, res)
+      cat(session_results_output(res))
+      cat('</div>')
+    }
+  }
+  cat('</div>')
+}
+```
+
+## Summary statistics
+```{r}
+cat('<div class="row">')
+for(sex in names(obj)){
+  for(condition in names(obj[[sex]])){
+    cat('<div class="col-md-3">')
+    h4(paste0(sex, "-", condition))
+    group_results <- filter(results, sex == sex,
+                            condition == condition) %>%
+      select(-animal)
+    average <- sapply(group_results, mean, na.rm=TRUE,
+                      USE.NAMES = TRUE)
+    cat(session_results_output(as.list(average)))
+    cat('</div>')
+  }
+}
+cat('</div>')
+```
+
+
