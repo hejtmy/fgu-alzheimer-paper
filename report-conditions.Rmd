@@ -83,7 +83,7 @@ cat('<div class="row">')
 for(sex_group in names(obj)){
   for(condition_group in names(obj[[sex_group]])){
     cat('<div class="col-md-3">')
-    h4(paste0(sex, "-", condition))
+    h4(paste0(sex_group, "-", condition_group))
     group_results <- dplyr::filter(results, sex == sex_group,
                             condition == condition_group) %>%
       select(-animal)
